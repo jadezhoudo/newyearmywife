@@ -1,7 +1,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>HAPPY NEW YEAR 2025 Yen Linh </title>
+    <title>HAPPY NEW YEAR 2025 Yen Linh</title>
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, user-scalable=no"
@@ -418,6 +418,24 @@
         -webkit-transition-duration: 0.4s;
         transition-duration: 0.4s;
       }
+      .heart-firework-btn {
+        position: absolute;
+        bottom: -50px;
+        right: 20px;
+        padding: 10px 20px;
+        font-size: 1.5em;
+        background-color: white;
+        border: none;
+        color: white;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s ease-in-out;
+      }
+
+      .heart-firework-btn:hover {
+        transform: scale(1.1);
+      }
     </style>
   </head>
   <body>
@@ -475,13 +493,8 @@
               <use href="#icon-sound-off" xlink:href="#icon-sound-off"></use>
             </svg>
           </div>
-          <div class="btn settings-btn">
-            <svg fill="white" width="24" height="24">
-              <use href="#icon-settings" xlink:href="#icon-settings"></use>
-            </svg>
-          </div>
+          <button id="heart-firework-btn" class="heart-firework-btn">💖</button>
         </div>
-		<button id="heart-firework-btn" class="heart-firework-btn">💖</button>
         <div class="menu hide">
           <div class="menu__inner-wrap">
             <div class="btn btn--bright close-menu-btn">
@@ -609,6 +622,11 @@
       const trailsStage = new Stage("trails-canvas");
       const mainStage = new Stage("main-canvas");
       const stages = [trailsStage, mainStage];
+      document
+        .getElementById("heart-firework-btn")
+        .addEventListener("click", () => {
+          addHeartFirework(); // Gọi hàm bắn pháo hoa hình trái tim
+        });
 
       function fullscreenEnabled() {
         return fscreen.fullscreenEnabled;
@@ -689,21 +707,6 @@
                 break;
               default:
                 throw new Error("version switch should be exhaustive");
-            }
-            console.log(`Loaded config (schema version ${schemaVersion})`);
-          } else if (localStorage.getItem("schemaVersion") === "1") {
-            let size;
-            try {
-              const sizeRaw = localStorage.getItem("configSize");
-              size = typeof sizeRaw === "string" && JSON.parse(sizeRaw);
-            } catch (e) {
-              console.log("Recovered from error parsing saved config:");
-              console.error(e);
-              return;
-            }
-            const sizeInt = parseInt(size, 10);
-            if (sizeInt >= 0 && sizeInt <= 4) {
-              this.state.config.size = String(sizeInt);
             }
           }
         },
@@ -1287,9 +1290,10 @@
       const shellNames = Object.keys(shellTypes);
 
       function init() {
-        document.querySelector(".loading-init").remove();
-        appNodes.stageContainer.classList.remove("remove");
-
+        setTimeout(() => {
+          document.querySelector(".loading-init").remove(); // Xóa màn hình loading sau 5 giây
+          appNodes.stageContainer.classList.remove("remove"); // Hiển thị ứng dụng chính
+        }, 3000);
         function setOptionsForSelect(node, options) {
           node.innerHTML = options.reduce(
             (acc, opt) =>
@@ -1558,7 +1562,7 @@
       function startSequence() {
         if (isFirstSeq) {
           isFirstSeq = false;
-		  addHeartFirework();
+          addHeartFirework();
           if (IS_HEADER) {
             return seqTwoRandom();
           } else {
@@ -1627,14 +1631,14 @@
       }
 
       function displayText(ctx, text, x, y, fontSize) {
-        ctx.save();
-        ctx.font = `${fontSize}px Russo One`;
-        ctx.fillStyle = "#ffffff";
-        ctx.shadowColor = "#ff0000";
-        ctx.shadowBlur = 10;
-        ctx.textAlign = "center";
-        ctx.fillText(text, x, y);
-        ctx.restore();
+        ctx.save(); // Lưu trạng thái hiện tại của canvas
+        ctx.font = `${fontSize}px Russo One`; // Định nghĩa font
+        ctx.fillStyle = "#ffffff"; // Màu chữ
+        ctx.shadowColor = "#ff0000"; // Hiệu ứng bóng
+        ctx.shadowBlur = 10; // Độ mờ bóng
+        ctx.textAlign = "center"; // Căn giữa văn bản
+        ctx.fillText(text, x, y); // Vẽ văn bản tại vị trí x, y
+        ctx.restore(); // Phục hồi trạng thái canvas
       }
 
       function addHeartFirework() {
@@ -1645,16 +1649,9 @@
         };
         heartEffect(star);
 
-        setTimeout(() => {
-          const ctx = mainStage.ctx;
-          displayText(
-            ctx,
-            "Ta Huynh Yen Linh",
-            stageW / 2,
-            stageH / 2 + 100,
-            50
-          );
-        }, 1500); // Hiển thị chữ sau khi pháo hoa kết thúc
+        const ctx = mainStage.ctx;
+        ctx.globalCompositeOperation = "source-over"; // Đảm bảo vẽ trên cùng
+        displayText(ctx, "Ta Huynh Yen Linh", stageW / 2, stageH / 2 + 100, 50);
       }
 
       let activePointerCount = 0;
@@ -2661,7 +2658,7 @@
       if (IS_HEADER) {
         init();
       } else {
-        setLoadingStatus("Lighting Fuses");
+        // setLoadingStatus("Lighting Fuses");
         setTimeout(() => {
           soundManager.preload().then(init, (reason) => {
             init();
